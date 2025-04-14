@@ -40,3 +40,42 @@ router.delete('/:id', (req, res) => {
 });
 
 export default router; // Export using ES module syntax
+
+//BELOW IS FOR DYNAMODB
+// const express = require('express');
+// const router = express.Router();
+// const db = require('../db/dynamodb');
+
+// // Add NGO
+// router.post('/add', async (req, res) => {
+//   const { id, name, subject, description } = req.body;
+
+//   const params = {
+//     TableName: 'NGODetails',
+//     Item: { id, name, subject, description }
+//   };
+
+//   try {
+//     await db.put(params).promise();
+//     res.status(200).json({ message: 'NGO added!' });
+//   } catch (err) {
+//     res.status(500).json({ error: 'Error adding NGO', details: err });
+//   }
+// });
+
+// // Get All NGOs
+// router.get('/list', async (req, res) => {
+//   const params = {
+//     TableName: 'NGODetails',
+//   };
+
+//   try {
+//     const data = await db.scan(params).promise();
+//     res.status(200).json(data.Items);
+//   } catch (err) {
+//     res.status(500).json({ error: 'Error fetching NGOs', details: err });
+//   }
+// });
+
+// module.exports = router;
+

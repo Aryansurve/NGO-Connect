@@ -65,14 +65,12 @@ const NGO = () => {
       <header className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6 shadow-lg">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-3xl font-bold">NGO Connect</h1>
-          <nav className="space-x-6">
+          <nav className="space-x-6 hidden sm:flex">
             <a href="/" className="text-white hover-underline">Home</a>
             <a href="/about" className="text-white hover-underline">About</a>
             <a href="/donate" className="text-white hover-underline">Donate</a>
             <a href="/contact" className="text-white hover-underline">Contact</a>
-            <a href="/updates" className="text-white hover-underline">Updates</a>
-            <a href="/register" className="text-white hover-underline">Register NGO</a>
-            <a href="/ngos" className="text-white hover-underline">NGOs</a>
+            <a href="/ngos" className="text-white hover-underline">Register NGOs</a>
           </nav>
         </div>
       </header>

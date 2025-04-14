@@ -12,9 +12,7 @@ const AboutUs = () => {
             <a href="/about" className="text-white hover-underline">About</a>
             <a href="/donate" className="text-white hover-underline">Donate</a>
             <a href="/contact" className="text-white hover-underline">Contact</a>
-            <a href="/updates" className="text-white hover-underline">Updates</a>
-            <a href="/register" className="text-white hover-underline">Register NGO</a>
-            <a href="/ngos" className="text-white hover-underline">NGOs</a>
+            <a href="/ngos" className="text-white hover-underline">Register NGOs</a>
           </nav>
           <button className="sm:hidden text-white">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
