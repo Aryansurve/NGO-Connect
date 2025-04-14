@@ -1,81 +1,89 @@
 import express from 'express';
+import multer from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
+import { Readable } from 'stream';
+import dotenv from 'dotenv';
+
+dotenv.config();
 const router = express.Router();
 
-// In-memory database
-let ngos = [
-  { id: 1, name: "NGO 1", subject: "Health", description: "Providing healthcare in rural areas." },
-  { id: 2, name: "NGO 2", subject: "Education", description: "Building schools in underserved regions." }
-];
-
-// Get all NGOs
-router.get('/', (req, res) => {
-  res.json(ngos);
+// ====== Cloudinary Config ======
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Add a new NGO
-router.post('/', (req, res) => {
-  const { name, subject, description } = req.body;
-  if (!name || !subject || !description) {
-    return res.status(400).json({ message: 'All fields are required' });
+// ====== Multer Config ======
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// ====== In-memory Database ======
+let ngos = [];
+
+// ====== GET all NGOs ======
+router.get('/', (req, res) => {
+  res.status(200).json(ngos);
+});
+
+// ====== POST Add New NGO with Image ======
+router.post('/', upload.single('image'), async (req, res) => {
+  const { name, subject, description, mission, impact, founded } = req.body;
+  const file = req.file;
+
+  if (!name || !subject || !description || !mission || !impact || !founded || !file) {
+    return res.status(400).json({ message: 'All fields including image are required' });
   }
 
-  const newNgo = {
-    id: Date.now(),
-    name,
-    subject,
-    description
-  };
-  ngos.push(newNgo);
-  res.status(201).json(newNgo);
+  try {
+    // Upload image to Cloudinary
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'ngos' },
+      (error, result) => {
+        if (error) {
+          console.error(error);
+          return res.status(500).json({ error: 'Cloudinary upload failed' });
+        }
+
+        // Add the new NGO data with Cloudinary image URL
+        const newNgo = {
+          id: Date.now().toString(),
+          name,
+          subject,
+          description,
+          mission,
+          impact,
+          founded,
+          imageUrl: result.secure_url,
+          createdAt: new Date().toISOString(),
+        };
+
+        ngos.push(newNgo); // Store the NGO in the in-memory database
+        res.status(201).json(newNgo); // Return the newly added NGO
+      }
+    );
+
+    const bufferStream = new Readable();
+    bufferStream.push(file.buffer);
+    bufferStream.push(null);
+    bufferStream.pipe(stream);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
 });
 
-// Delete an NGO
+// ====== DELETE NGO by ID ======
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
-  const index = ngos.findIndex(ngo => ngo.id == id);
-  if (index === -1) return res.status(404).json({ message: 'NGO not found' });
+  const index = ngos.findIndex(ngo => ngo.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ message: 'NGO not found' });
+  }
 
   ngos.splice(index, 1);
-  res.status(200).json({ message: 'NGO deleted' });
+  res.status(200).json({ message: 'NGO deleted successfully' });
 });
 
-export default router; // Export using ES module syntax
-
-//BELOW IS FOR DYNAMODB
-// const express = require('express');
-// const router = express.Router();
-// const db = require('../db/dynamodb');
-
-// // Add NGO
-// router.post('/add', async (req, res) => {
-//   const { id, name, subject, description } = req.body;
-
-//   const params = {
-//     TableName: 'NGODetails',
-//     Item: { id, name, subject, description }
-//   };
-
-//   try {
-//     await db.put(params).promise();
-//     res.status(200).json({ message: 'NGO added!' });
-//   } catch (err) {
-//     res.status(500).json({ error: 'Error adding NGO', details: err });
-//   }
-// });
-
-// // Get All NGOs
-// router.get('/list', async (req, res) => {
-//   const params = {
-//     TableName: 'NGODetails',
-//   };
-
-//   try {
-//     const data = await db.scan(params).promise();
-//     res.status(200).json(data.Items);
-//   } catch (err) {
-//     res.status(500).json({ error: 'Error fetching NGOs', details: err });
-//   }
-// });
-
-// module.exports = router;
-
+export default router;

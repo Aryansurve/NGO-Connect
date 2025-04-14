@@ -119,7 +119,7 @@ const Donate = () => {
                 {/* NGO Logo/Image */}
                 <div className="h-48 bg-blue-100 flex items-center justify-center">
                   <img 
-                    src={ngo.logo || "/api/placeholder/300/200"} 
+                    src={ngo.imageUrl || "/api/placeholder/300/200"} 
                     alt={ngo.name} 
                     className="max-h-full object-contain"
                   />
